@@ -1,0 +1,644 @@
+[
+ {
+   "Name": "Nuke (AOE-9 Rocket)",
+   "Category": "Building",
+   "Alloys": 350,
+   "Rares": 7000
+ },
+ {
+   "Name": "Intelligence Center",
+   "Category": "Building",
+   "Alloys": 3,
+   "Rares": 60
+ },
+ {
+   "Name": "Storm Cannon",
+   "Category": "Building",
+   "Alloys": 20,
+   "Rares": 400
+ },
+ {
+   "Name": "Underground Fortress",
+   "Category": "Building",
+   "Alloys": 5,
+   "Rares": 100
+ },
+ {
+   "Name": "Aircraft Radar",
+   "Category": "Building",
+   "Alloys": 3,
+   "Rares": 60
+ },
+ {
+   "Name": "Naval Works (Small Assembly Station upgrade)",
+   "Category": "Building",
+   "Alloys": 10,
+   "Rares": 200
+ },
+ {
+   "Name": "Advanced Structure Manufactory (Small Assembly Station upgrade)",
+   "Category": "Building",
+   "Alloys": 35,
+   "Rares": 700
+ },
+ {
+   "Name": "Aircraft Assembly (Large Assembly Station upgrade)",
+   "Category": "Building",
+   "Alloys": 5,
+   "Rares": 100
+ },
+ {
+   "Name": "Pilot Uniform",
+   "Category": "Uniform",
+   "Alloys": 0.05,
+   "Rares": 1
+ },
+ {
+   "Name": "Colonial Heavy Bomber (V-1 Tzykalia)",
+   "Category": "Aircraft",
+   "Alloys": 12,
+   "Rares": 240
+ },
+ {
+   "Name": "Warden Heavy Bomber (Tulka P4 Welkinrive)",
+   "Category": "Aircraft",
+   "Alloys": 12,
+   "Rares": 240
+ },
+ {
+   "Name": "Warden Fighter (Luminary Mk. II Harbinger)",
+   "Category": "Aircraft",
+   "Alloys": 2,
+   "Rares": 40
+ },
+ {
+   "Name": "Colonial Fighter (Toxot-902 \"Blind Silver\")",
+   "Category": "Aircraft",
+   "Alloys": 2,
+   "Rares": 40
+ },
+ {
+   "Name": "Warden Torpedo Bomber (M925 Austringer Man-O-War)",
+   "Category": "Aircraft",
+   "Alloys": 5,
+   "Rares": 100
+ },
+ {
+   "Name": "Warden Transport Aircraft (Rinnspeir Mk. I Zealot)",
+   "Category": "Aircraft",
+   "Alloys": 4,
+   "Rares": 80
+ },
+ {
+   "Name": "Colonial Transport Aircraft (V-5b Pegasus)",
+   "Category": "Aircraft",
+   "Alloys": 4,
+   "Rares": 80
+ },
+ {
+   "Name": "Warden Amphibious Fighter (Tulka I1.9 White Raven)",
+   "Category": "Aircraft",
+   "Alloys": 2,
+   "Rares": 40
+ },
+ {
+   "Name": "Colonial Dive Bomber (Mergo-4 \"Myrmidon\")",
+   "Category": "Aircraft",
+   "Alloys": 5,
+   "Rares": 100
+ },
+ {
+   "Name": "Colonial Super Tank (O-75b \"Ares\")",
+   "Category": "Aircraft",
+   "Alloys": 3,
+   "Rares": 60
+ },
+ {
+   "Name": "Warden Super Tank (Cullen Predator Mk. III)",
+   "Category": "Aircraft",
+   "Alloys": 3,
+   "Rares": 60
+ },
+ {
+   "Name": "BMS Bloodtender (Hospital Train Car)",
+   "Category": "Train",
+   "Alloys": 2,
+   "Rares": 40
+ },
+ {
+   "Name": "Tempest Cannon RA-2 (Rail Storm Cannon)",
+   "Category": "Train",
+   "Alloys": 35,
+   "Rares": 700
+ },
+ {
+   "Name": "Titan Colonial Battleship",
+   "Category": "Ship",
+   "Alloys": 160,
+   "Rares": 3200
+ },
+ {
+   "Name": "Callahan Warden Battleship",
+   "Category": "Ship",
+   "Alloys": 160,
+   "Rares": 3200
+ },
+ {
+   "Name": "Conqueror Colonial Destroyer",
+   "Category": "Ship",
+   "Alloys": 48,
+   "Rares": 960
+ },
+ {
+   "Name": "Blacksteele Warden Light Frigate",
+   "Category": "Ship",
+   "Alloys": 48,
+   "Rares": 960
+ },
+ {
+   "Name": "AC-b \"Trident\" Colonial Submarine",
+   "Category": "Ship",
+   "Alloys": 60,
+   "Rares": 1200
+ },
+ {
+   "Name": "Nakki Warden Submarine",
+   "Category": "Ship",
+   "Alloys": 60,
+   "Rares": 1200
+ },
+ {
+   "Name": "Poseidon Colonial Aircraft Carrier",
+   "Category": "Ship",
+   "Alloys": 64,
+   "Rares": 1280
+ },
+ {
+   "Name": "Mercy Warden Aircraft Carrier",
+   "Category": "Ship",
+   "Alloys": 64,
+   "Rares": 1280
+ },
+ {
+   "Name": "BMS Longhook Base Ship",
+   "Category": "Ship",
+   "Alloys": 32,
+   "Rares": 640
+ },
+ {
+   "Name": "BMS Bluefin Storage Ship",
+   "Category": "Ship",
+   "Alloys": 100,
+   "Rares": 2000
+ },
+ {
+   "Name": "BMS Bowhead Resource Ship",
+   "Category": "Ship",
+   "Alloys": 32,
+   "Rares": 640
+ },
+ {
+   "Name": "Armored Car",
+   "Category": "Armored Fighting Vehicle",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Armored Rocket Platform",
+   "Category": "Armored Fighting Vehicle",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Tankette",
+   "Category": "Armored Fighting Vehicle",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Landing APC",
+   "Category": "Armored Fighting Vehicle",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Half-Track",
+   "Category": "Armored Fighting Vehicle",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Field AT Rifle (14.5mm push gun)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Field Machine Gun (12.7mm push gun)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Field Artillery (Collie Mobile 120mm)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Field Launcher (Warden Rocket Wasp Nest)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Field Cannon (40mm push gun)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Field AT Gun (68mm push gun)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Field Mortar (250mm mortar push gun)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Heavy Field Cannon (Warden Rampart - HV 68mm push gun)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Heavy Field Gun (Collie Smelter - HV 40mm push gun)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Large Field Gun (Warden Stockade - 75mm)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Large Field Gun (Stygian Bolt - 94.5mm)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Large Field Mortar (Collie Alekto - 250mm mortar)",
+   "Category": "Push Gun",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Scout Tank (King Spire - 12.7mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Scout Tank (King Gallant - 30mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Scout Tank (King Jester - Shatter Missiles)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Tank (Hatchet - 40mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Tank (Pelekys - 68mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Tank (Vulcan - Flamethrower)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Tank (Kranesca - 40mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Tank (Devitt - 40mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Tank (Devitt Ironhide - 40mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Tank (Devitt-Caine - Mortar)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Assault Tank (Falchion - 40mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Assault Tank (Spatha - 40mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Assault Tank (Talos - 75mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Assault Tank (Bardiche - 68mm + 12.7mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Assault Tank (Ranseur - RPG + 12.7mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Assault Tank (Nemesis - 68mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Assault Tank (Silverhand - 40mm + 68mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Assault Tank (Silverhand Chieftain - 250mm + 12.7mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Assault Tank (Silverhand Lordscar - 94.5mm - STD)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Cruiser Tank (Brigand - 30mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Cruiser Tank (Highwayman - 14.7mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Cruiser Tank (Outlaw - 40mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Cruiser Tank (Thornfall - ARC/RPG)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Infantry Tank (Scorpion - 12.7mm - IST)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Siege Tank (Ballista - 250mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Destroyer Tank (Noble Widow - 68mm - HTD)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Destroyer Tank (Noble Firebrand + flamethrower)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Battle Tank (Flood Juggernaut - 75mm + flamethrower)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Battle Tank (Flood - 75mm + 12.7mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Battle Tank (Flood Stain - 150mm SPG)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Battle Tank (Hasta - 94.5mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Battle Tank (Lance - 75mm + 12.7mm)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Battle Tank (Sarissa - 150mm SPG)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Advanced Construction Vehicle",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Harvester",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Flatbed",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Truck",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Heavy-Duty Truck",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Fire Engine",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Fuel Tanker",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Bicycle",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Motorcycle",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Utility Vehicle (Jeep - LUV)",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Construction Vehicle",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Crane",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Ambulance",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Transport Bus",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Scout Plane",
+   "Category": "Aircraft",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Large Crane",
+   "Category": "Other Land Vehicles",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Locomotive",
+   "Category": "Train",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Gunboat",
+   "Category": "Boat",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Infantry Boat",
+   "Category": "Boat",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Siege Boat",
+   "Category": "Boat",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Mine Boat",
+   "Category": "Boat",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Gunship",
+   "Category": "Boat",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Freighter",
+   "Category": "Boat",
+   "Alloys": 0,
+   "Rares": 0
+ },
+ {
+   "Name": "Light Freighter",
+   "Category": "Boat",
+   "Alloys": 0,
+   "Rares": 0
+ }
+]
