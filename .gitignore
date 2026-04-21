@@ -205,3 +205,11 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+FoxholeKillRareTracker.py
+bank_accounts.json
+bank_log.json
+contributions.json
+.gitignore
+roles.json
+goals.json
+kills_losses_NWO.json

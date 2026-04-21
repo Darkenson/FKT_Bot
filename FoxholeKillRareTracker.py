@@ -32,40 +32,71 @@ BANK_ACCOUNTS_FILE          = os.path.join(BASE_DIR, "bank_accounts.json")
 BANK_LOG_FILE               = os.path.join(BASE_DIR, "bank_log.json")
 
 def load_goals():
+    """Return goals for the current war only: { pool: { item, cost } }"""
     if os.path.exists(GOALS_FILE):
         with open(GOALS_FILE, "r") as f:
-            return json.load(f)
+            all_goals = json.load(f)
+        return all_goals.get(str(war), {})
     return {}
 
 def save_goals(goals):
+    """Save goals for the current war, preserving other wars."""
+    all_goals = {}
+    if os.path.exists(GOALS_FILE):
+        with open(GOALS_FILE, "r") as f:
+            all_goals = json.load(f)
+    all_goals[str(war)] = goals
     with open(GOALS_FILE, "w") as f:
-        json.dump(goals, f)
+        json.dump(all_goals, f)
 
 # ── Bank accounts ────────────────────────────────────────────────────────────
 # Structure: { banker_name: { location: { "rares": int, "alloys": int } } }
 
 def load_bank_accounts() -> dict:
+    """Return bank accounts for the current war only."""
     if os.path.exists(BANK_ACCOUNTS_FILE):
         with open(BANK_ACCOUNTS_FILE, "r") as f:
-            return json.load(f)
+            all_accounts = json.load(f)
+        # Legacy: if top-level keys look like banker names (not war numbers), treat as war 0
+        if all_accounts and not all(k.isdigit() for k in all_accounts):
+            return all_accounts if str(war) == "0" else {}
+        return all_accounts.get(str(war), {})
     return {}
 
 def save_bank_accounts(accounts: dict):
+    """Save bank accounts for the current war, preserving other wars."""
+    all_accounts = {}
+    if os.path.exists(BANK_ACCOUNTS_FILE):
+        with open(BANK_ACCOUNTS_FILE, "r") as f:
+            all_accounts = json.load(f)
+        # Migrate legacy flat format on first war-scoped save
+        if all_accounts and not all(k.isdigit() for k in all_accounts):
+            all_accounts = {}
+    all_accounts[str(war)] = accounts
     with open(BANK_ACCOUNTS_FILE, "w") as f:
-        json.dump(accounts, f, indent=2)
+        json.dump(all_accounts, f, indent=2)
 
 def load_bank_log() -> list:
     if os.path.exists(BANK_LOG_FILE):
         with open(BANK_LOG_FILE, "r") as f:
-            return json.load(f)
+            log = json.load(f)
+        return [e for e in log if str(e.get("war", war)) == str(war)]
     return []
 
 def save_bank_log(log: list):
+    # Merge with entries from other wars before saving
+    all_log = []
+    if os.path.exists(BANK_LOG_FILE):
+        with open(BANK_LOG_FILE, "r") as f:
+            all_log = json.load(f)
+    # Remove current war's entries, then re-add the updated ones
+    other_wars = [e for e in all_log if str(e.get("war", war)) != str(war)]
     with open(BANK_LOG_FILE, "w") as f:
-        json.dump(log, f, indent=2)
+        json.dump(other_wars + log, f, indent=2)
 
 def append_bank_log(entry: dict):
     log = load_bank_log()
+    entry["war"] = war
     entry["log_id"] = (max((e["log_id"] for e in log), default=0) + 1)
     log.append(entry)
     save_bank_log(log)
@@ -639,32 +670,50 @@ def items_for_pool(pool: str) -> list[dict]:
 def load_contributions():
     if os.path.exists(CONTRIBUTIONS_FILE):
         with open(CONTRIBUTIONS_FILE, "r") as f:
-            return json.load(f)
+            all_data = json.load(f)
+        return [c for c in all_data if str(c.get("war", war)) == str(war)]
     return []
 
 def save_contributions(contributions):
+    all_data = []
+    if os.path.exists(CONTRIBUTIONS_FILE):
+        with open(CONTRIBUTIONS_FILE, "r") as f:
+            all_data = json.load(f)
+    other_wars = [c for c in all_data if str(c.get("war", war)) != str(war)]
     with open(CONTRIBUTIONS_FILE, "w") as f:
-        json.dump(contributions, f)
+        json.dump(other_wars + contributions, f)
 
 def load_rare_lost():
     if os.path.exists(RARE_LOST_FILE):
         with open(RARE_LOST_FILE, "r") as f:
-            return json.load(f)
+            all_data = json.load(f)
+        return [l for l in all_data if str(l.get("war", war)) == str(war)]
     return []
 
 def save_rare_lost(lost):
+    all_data = []
+    if os.path.exists(RARE_LOST_FILE):
+        with open(RARE_LOST_FILE, "r") as f:
+            all_data = json.load(f)
+    other_wars = [l for l in all_data if str(l.get("war", war)) != str(war)]
     with open(RARE_LOST_FILE, "w") as f:
-        json.dump(lost, f)
+        json.dump(other_wars + lost, f)
 
 def load_rare_builds():
     if os.path.exists(RARE_BUILDS_FILE):
         with open(RARE_BUILDS_FILE, "r") as f:
-            return json.load(f)
+            all_data = json.load(f)
+        return [b for b in all_data if str(b.get("war", war)) == str(war)]
     return []
 
 def save_rare_builds(builds):
+    all_data = []
+    if os.path.exists(RARE_BUILDS_FILE):
+        with open(RARE_BUILDS_FILE, "r") as f:
+            all_data = json.load(f)
+    other_wars = [b for b in all_data if str(b.get("war", war)) != str(war)]
     with open(RARE_BUILDS_FILE, "w") as f:
-        json.dump(builds, f)
+        json.dump(other_wars + builds, f)
 
 # ============================================================
 # AUTOCOMPLETE HELPERS
@@ -914,6 +963,7 @@ class ContributionConfirmView(discord.ui.View):
             "pool":       self.pool,
             "vote":       self.vote,
             "logged_by":  interaction.user.name,
+            "war":        war,
             "timestamp":  self.submitted_at
         })
         save_contributions(contributions)
@@ -1131,6 +1181,7 @@ async def rare_lost(interaction: discord.Interaction, amount: int, reason: str):
         "amount": amount,
         "reason": reason,
         "logged_by": interaction.user.name,
+        "war": war,
         "timestamp": str(interaction.created_at)
     })
     save_rare_lost(lost)
@@ -1170,6 +1221,7 @@ async def rare_build(interaction: discord.Interaction, vehicle: str, assigned_to
         "assigned_to": assigned_to,
         "status": "alive",
         "logged_by": interaction.user.name,
+        "war": war,
         "timestamp": str(interaction.created_at)
     })
     save_rare_builds(builds)
@@ -1350,7 +1402,7 @@ bank = app_commands.Group(name="bank", description="Rare Banker personal account
 async def bank_location_autocomplete(interaction: discord.Interaction, current: str) -> list[app_commands.Choice]:
     """Suggest locations that already exist in any banker's account, plus 'loose'."""
     accounts = load_bank_accounts()
-    seen: set[str] = {"loose", "cooking"}
+    seen: set[str] = {"loose"}
     for slots in accounts.values():
         seen.update(slots.keys())
     return [
@@ -1410,15 +1462,17 @@ async def bank_help(interaction: discord.Interaction):
         "`/bank log` — View recent bank transactions (with filters)\n\n"
         
         "**Transactions**\n"
-        "`/bank deposit` — Deposit rares/alloys into a storage location\n"
+        "`/bank deposit` — Deposit rares/alloys from your loose stock into a storage location\n"
+        "`/bank cook` — Convert loose rares into alloys (20:1) and deposit to a location\n"
         "`/bank retrieve` — Move materials from a location back to your loose stock\n"
         "`/bank handover` — Transfer materials to another banker's loose stock\n"
-        "`/bank spend` — Spend alloys from a location (e.g. building vehicles)\n\n"
+        "`/bank spend` — Spend alloys from a location (e.g. building vehicles)\n"
+        "`/bank lost` — Log rares/alloys that were lost or stolen from a location\n\n"
         
         "**Useful Tips:**\n"
         "• Only Rare Bankers can use these commands.\n"
         "• `loose` is your main portable stock.\n"
-        "• Depositing alloys automatically consumes 20 loose rares per alloy.\n"
+        "• Use `/bank cook` to convert rares → alloys at 20:1 before depositing.\n"
         "• Use `/bank log` with filters to see specific activity.\n"
     )
 
@@ -1487,45 +1541,25 @@ async def bank_deposit(interaction: discord.Interaction, location: str, rares: i
     banker   = interaction.user.name
     accounts = load_bank_accounts()
 
-    # Consume loose rares: each alloy deposited costs 20 loose rares
-    loose_consumed      = 0
-    loose_rares_bal     = accounts.get(banker, {}).get("loose", {}).get("rares", 0)
-    loose_alloy_bal     = accounts.get(banker, {}).get("loose", {}).get("alloys", 0)
-
-    if ((alloys*20 + rares) > (loose_alloy_bal*20 + loose_rares_bal) or rares > loose_rares_bal):
-        await interaction.response.send_message("❌ You don't have enough resources to deposit.", ephemeral=True)
+    err = bank_debit(accounts, banker, "loose", rares, alloys)
+    if err:
+        await interaction.response.send_message(err, ephemeral=True)
         return
-
-    remaining_alloys    = alloys - loose_alloy_bal
-    loose_cost          = remaining_alloys * 20 + rares
-    loose_consumed = min(loose_rares_bal, loose_cost)
-    if loose_consumed > 0:
-        # Debit from loose
-        accounts.setdefault(banker, {}).setdefault("loose", {"rares": 0, "alloys": 0})
-        accounts[banker]["loose"]["rares"] -= loose_consumed
-        if (accounts[banker]["loose"]["alloys"] >= alloys):
-            accounts[banker]["loose"]["alloys"] -= alloys
-        else:
-            accounts[banker]["loose"]["alloys"] = 0
-        if accounts[banker]["loose"]["rares"] == 0 and accounts[banker]["loose"]["alloys"] == 0:
-            del accounts[banker]["loose"]
 
     bank_credit(accounts, banker, location, rares, alloys)
     save_bank_accounts(accounts)
 
     append_bank_log({
-        "op":             "deposit",
-        "banker":         banker,
-        "location":       location,
-        "rares":          rares,
-        "alloys":         alloys,
-        "loose_consumed": loose_consumed,
-        "timestamp":      str(interaction.created_at),
+        "op":        "deposit",
+        "banker":    banker,
+        "location":  location,
+        "rares":     rares,
+        "alloys":    alloys,
+        "timestamp": str(interaction.created_at),
     })
 
-    note = f"\n*(💎 `{(alloys-loose_alloy_bal) * 20}` loose rares converted to alloys)*" if (alloys-loose_alloy_bal) > 0 else ""
     await interaction.response.send_message(
-        f"✅ Deposited to **{location}**: 💎 `{rares}` rares | 🪨 `{alloys}` alloys{note}"
+        f"✅ Deposited to **{location}**: 💎 `{rares}` rares | 🪨 `{alloys}` alloys"
     )
 
 # ── /bank retrieve ───────────────────────────────────────────────────────────
@@ -1675,11 +1709,140 @@ async def bank_spend(interaction: discord.Interaction, location: str, alloys: in
         f"💸 Spent 🪨 `{alloys}` alloys from **{location}** — Reason: *{reason}*"
     )
 
+# ── /bank lost ───────────────────────────────────────────────────────────────
+
+@bank.command(name="lost", description="Log rares or alloys that were lost or stolen from a storage location")
+@app_commands.describe(
+    location="The location the materials were lost from",
+    rares="Number of rares lost (can be 0 if only alloys)",
+    alloys="Number of alloys lost (can be 0 if only rares)",
+    reason="Why the materials were lost (e.g. 'stockpile was captured', 'stolen')",
+)
+@app_commands.autocomplete(location=bank_own_location_autocomplete)
+async def bank_lost(interaction: discord.Interaction, location: str, reason: str, rares: int = 0, alloys: int = 0):
+    user_roles = {r.name for r in interaction.user.roles}
+    if not user_roles.intersection(banker_roles):
+        await interaction.response.send_message("❌ Only Rare Bankers can log losses.", ephemeral=True)
+        return
+
+    if rares < 0 or alloys < 0:
+        await interaction.response.send_message("❌ Values must be positive (≥ 0).", ephemeral=True)
+        return
+    if rares == 0 and alloys == 0:
+        await interaction.response.send_message("❌ At least one of rares or alloys must be greater than 0.", ephemeral=True)
+        return
+
+    banker   = interaction.user.name
+    accounts = load_bank_accounts()
+    err      = bank_debit(accounts, banker, location, rares, alloys)
+    if err:
+        await interaction.response.send_message(err, ephemeral=True)
+        return
+
+    save_bank_accounts(accounts)
+
+    append_bank_log({
+        "op":       "lost",
+        "banker":   banker,
+        "location": location,
+        "rares":    rares,
+        "alloys":   alloys,
+        "reason":   reason,
+        "timestamp": str(interaction.created_at),
+    })
+
+    await interaction.response.send_message(
+        f"📉 Lost from **{location}**: 💎 `{rares}` rares | 🪨 `{alloys}` alloys — Reason: *{reason}*"
+    )
+
+# ── /bank cook ───────────────────────────────────────────────────────────────
+
+COOK_GIF_URL = "https://i.imgur.com/JjtIwMH.gif"
+
+@bank.command(name="cook", description="Convert loose rares into alloys at 20:1 and deposit them to a location")
+@app_commands.describe(
+    location="The storage location to deposit the cooked alloys (and leftover rares) to",
+    rares="Number of loose rares to cook (optional — defaults to all available loose rares)",
+)
+@app_commands.autocomplete(location=bank_location_autocomplete)
+async def bank_cook(interaction: discord.Interaction, location: str, rares: int = None):
+    user_roles = {r.name for r in interaction.user.roles}
+    if not user_roles.intersection(banker_roles):
+        await interaction.response.send_message("❌ Only Rare Bankers can cook.", ephemeral=True)
+        return
+
+    banker   = interaction.user.name
+    accounts = load_bank_accounts()
+
+    loose_rares  = accounts.get(banker, {}).get("loose", {}).get("rares", 0)
+    loose_alloys = accounts.get(banker, {}).get("loose", {}).get("alloys", 0)
+
+    if loose_rares == 0:
+        await interaction.response.send_message("❌ You have no loose rares to cook.", ephemeral=True)
+        return
+
+    # Default to all loose rares if not specified
+    rares_to_cook = loose_rares if rares is None else rares
+
+    if rares_to_cook <= 0:
+        await interaction.response.send_message("❌ Amount of rares to cook must be greater than 0.", ephemeral=True)
+        return
+
+    if rares_to_cook > loose_rares:
+        await interaction.response.send_message(
+            f"❌ Insufficient loose rares: have 💎 `{loose_rares}`, tried to cook `{rares_to_cook}`.",
+            ephemeral=True
+        )
+        return
+
+    cooked_alloys    = rares_to_cook // 20
+    leftover_rares   = rares_to_cook % 20
+    unconsumed_rares = loose_rares - rares_to_cook   # rares not touched at all
+
+    if cooked_alloys == 0:
+        await interaction.response.send_message(
+            f"Not enough rares to make even 1 alloy — need at least 20, you're cooking `{rares_to_cook}`.",
+            ephemeral=True
+        )
+        return
+
+    # Debit all rares_to_cook from loose
+    err = bank_debit(accounts, banker, "loose", rares_to_cook, 0)
+    if err:
+        await interaction.response.send_message(err, ephemeral=True)
+        return
+
+    # Credit leftover rares + cooked alloys to the target location
+    bank_credit(accounts, banker, location, leftover_rares, cooked_alloys)
+    save_bank_accounts(accounts)
+
+    append_bank_log({
+        "op":         "cook",
+        "banker":     banker,
+        "location":   location,
+        "rares_in":   rares_to_cook,
+        "alloys_out": cooked_alloys,
+        "rares_left": leftover_rares,
+        "timestamp":  str(interaction.created_at),
+    })
+
+    new_loose_rares = unconsumed_rares
+
+    await interaction.response.send_message(
+        f"🧪 **We've gotta cook, Mr. White!**\n"
+        f"{COOK_GIF_URL}\n\n"
+        f"**Starting loose balance:** 💎 `{loose_rares}` rares | 🪨 `{loose_alloys}` alloys\n\n"
+        f"🔥 Cooked `{rares_to_cook}` rares → 🪨 `{cooked_alloys}` alloys "
+        f"*(+💎 `{leftover_rares}` remainder)*\n\n"
+        f"**Added at {location}:** 💎 `{leftover_rares}` rares | 🪨 `{cooked_alloys}` alloys\n"
+        f"**Remaining loose:** 💎 `{new_loose_rares}` rares | 🪨 `{loose_alloys}` alloys" if location != "loose" else ""
+    )
+
 @bank.command(name="log", description="View recent bank transactions in a readable format")
 @app_commands.describe(
     limit="How many recent entries to show (default 25, max 100)",
     banker="Filter by banker name (optional)",
-    op="Filter by operation type: contribution_received, deposit, retrieve, handover, spend"
+    op="Filter by operation type: contribution_received, deposit, retrieve, handover, spend, cook, lost"
 )
 async def bank_log_cmd(interaction: discord.Interaction, limit: int = 25, banker: str = None, op: str = None):
     if not any(r.name in banker_roles for r in interaction.user.roles):
@@ -1731,6 +1894,12 @@ async def bank_log_cmd(interaction: discord.Interaction, limit: int = 25, banker
 
         elif op == "spend":
             line = f"`#{entry['log_id']}` **{ts}** | **{entry['banker']}** spent 🪨 `{entry['alloys']}` alloys from **{entry['location']}** → *{entry['reason']}*"
+
+        elif op == "cook":
+            line = f"`#{entry['log_id']}` **{ts}** | **{entry['banker']}** cooked 💎 `{entry['rares_in']}` rares → 🪨 `{entry['alloys_out']}` alloys to **{entry['location']}** *(💎 `{entry['rares_left']}` leftover)*"
+
+        elif op == "lost":
+            line = f"`#{entry['log_id']}` **{ts}** | **{entry['banker']}** lost from **{entry['location']}** — 💎 `{entry['rares']}` rares | 🪨 `{entry['alloys']}` alloys → *{entry['reason']}*"
 
         else:
             line = f"`#{entry['log_id']}` **{ts}** | Unknown operation: {op}"
