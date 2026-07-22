@@ -213,3 +213,7 @@ contributions.json
 roles.json
 goals.json
 kills_losses_NWO.json
+RunServer.bat
+config.json
+lost.txt
+rare_builds.json
