@@ -31,6 +31,90 @@ GOALS_FILE                  = os.path.join(BASE_DIR, "goals.json")
 BANK_ACCOUNTS_FILE          = os.path.join(BASE_DIR, "bank_accounts.json")
 BANK_LOG_FILE               = os.path.join(BASE_DIR, "bank_log.json")
 
+class ContributionPaginator(discord.ui.View):
+    def __init__(self, pages: list[discord.Embed], author_id: int):
+        super().__init__(timeout=120)
+        self.pages = pages
+        self.current = 0
+        self.author_id = author_id
+        self.message: discord.Message | None = None
+        self._update_buttons()
+
+    def _update_buttons(self):
+        self.previous_button.disabled = self.current == 0
+        self.next_button.disabled = self.current == len(self.pages) - 1
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.author_id:
+            await interaction.response.send_message(
+                "Only the person who ran this command can navigate the pages.", ephemeral=True
+            )
+            return False
+        return True
+
+    async def on_timeout(self):
+        for item in self.children:
+            item.disabled = True
+        if self.message:
+            try:
+                await self.message.edit(view=self)
+            except discord.HTTPException:
+                pass
+
+    @discord.ui.button(label="◀ Previous", style=discord.ButtonStyle.secondary)
+    async def previous_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.current -= 1
+        self._update_buttons()
+        await interaction.response.edit_message(embed=self.pages[self.current], view=self)
+
+    @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.secondary)
+    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.current += 1
+        self._update_buttons()
+        await interaction.response.edit_message(embed=self.pages[self.current], view=self)
+
+def build_contribution_pages(display_list, header_suffix, per_page=15, char_limit=3900) -> list[discord.Embed]:
+    """Split contributions into embed pages, respecting both a max entry count and embed description limit."""
+    total_rares_all = sum(c.get("amount", 0) for c in display_list)
+
+    i = 0
+    page_num = 1
+    total_pages = (len(display_list) + per_page - 1) // per_page
+    embeds = []
+
+    while i < len(display_list):
+        chunk = display_list[i:i + per_page]
+        lines = []
+
+        for c in chunk:
+            ts = datetime.fromisoformat(c["timestamp"]).strftime("%Y-%m-%d %H:%M")
+            amount = c.get("amount", 0)
+            pool = c.get("pool", c.get("target", "?"))   # graceful fallback for old records
+            lines.append(
+                f"`#{c['id']}` **{c['player']}** — `{amount}` rares → Pool: **{pool}** banked by **{c['logged_by']}** at {ts}"
+            )
+
+        description = "\n".join(lines)
+
+        # Safety: if even this chunk is too long (e.g. very long names), shrink it further
+        while len(description) > char_limit and len(chunk) > 1:
+            chunk = chunk[:len(chunk) - 1]
+            lines = lines[:len(chunk)]
+            description = "\n".join(lines)
+
+        embed = discord.Embed(
+            title=f"💎 Rare Contributions{header_suffix}",
+            description=description,
+            color=discord.Color.blurple(),
+        )
+        embed.set_footer(text=f"Page {page_num}/{total_pages} • Total Rares (all pages): 💎 {total_rares_all}")
+        embeds.append(embed)
+
+        i += len(chunk)
+        page_num += 1
+
+    return embeds
+
 def load_goals():
     """Return goals for the current war only: { pool: { item, cost } }"""
     if os.path.exists(GOALS_FILE):
@@ -293,7 +377,8 @@ async def fkt_help(interaction: discord.Interaction):
         "`/config_fkt config` — Set the active war, shard, side, and regiment tag (Admin only)\n"
         "`/config_fkt add_perms` — Give a role moderator permissions (Admin only)\n"
         "`/config_fkt remove_perms` — Remove moderator permissions from a role (Admin only)\n"
-        "`/config_fkt clear_kill_list` — Wipe the entire kill/loss record (Admin only)\n\n"
+        "`/config_fkt clear_kill_list` — Wipe the entire kill/loss record (Admin only)\n"
+        "`/config_fkt role_purge` — Move every member from one role to another, e.g. \"Warden\" → \"Warden awaiting verification\" (Admin only)\n\n"
         
         "**Useful Tip:**\n"
         "• Use `/config_fkt config` when a new war begins."
@@ -396,6 +481,98 @@ async def clear_kills(interaction: discord.Interaction):
         return
     save_kills_losses([])
     await interaction.response.send_message("🗑️ Kill and loss list cleared.")
+
+async def manageableRoles_autocomplete(interaction: discord.Interaction, current: str):
+    """Roles below the bot's own top role — the only roles the bot is allowed to grant/remove."""
+    guild = interaction.guild
+    if not guild or not guild.me:
+        return []
+    bot_top_role = guild.me.top_role
+    return [
+        app_commands.Choice(name=role.name, value=role.name)
+        for role in guild.roles
+        if role.name != "@everyone" and role < bot_top_role and current.lower() in role.name.lower()
+    ][:25]  # Discord allows up to 25 autocomplete choices
+
+@config_fkt.command(
+    name="role_purge",
+    description='Move every member from one role to another (e.g. "Warden" -> "Warden awaiting verification")'
+)
+@app_commands.describe(
+    from_role="The role to remove from every member who has it",
+    to_role="The role to give those members instead"
+)
+@app_commands.autocomplete(from_role=manageableRoles_autocomplete, to_role=manageableRoles_autocomplete)
+async def role_purge(interaction: discord.Interaction, from_role: str, to_role: str):
+    user_roles = {role.name for role in interaction.user.roles}
+    if not bool(user_roles.intersection(admin_roles)):
+        await interaction.response.send_message("❌ Only admins can run a role purge.", ephemeral=True)
+        return
+
+    guild = interaction.guild
+    if guild is None:
+        await interaction.response.send_message("❌ This command must be used in a server.", ephemeral=True)
+        return
+
+    if from_role == to_role:
+        await interaction.response.send_message("❌ `from_role` and `to_role` can't be the same role.", ephemeral=True)
+        return
+
+    from_role_obj = discord.utils.get(guild.roles, name=from_role)
+    to_role_obj = discord.utils.get(guild.roles, name=to_role)
+
+    if from_role_obj is None:
+        await interaction.response.send_message(f'❌ Role "{from_role}" was not found on this server.', ephemeral=True)
+        return
+    if to_role_obj is None:
+        await interaction.response.send_message(f'❌ Role "{to_role}" was not found on this server.', ephemeral=True)
+        return
+
+    bot_member = guild.me
+    if bot_member.top_role <= from_role_obj or bot_member.top_role <= to_role_obj:
+        await interaction.response.send_message(
+            "❌ My highest role must be positioned **above** both "
+            f'"{from_role}" and "{to_role}" in the server role list for this to work. '
+            "(These should only show up in the dropdown if that's already the case — "
+            "did the role order change after you started typing the command?)",
+            ephemeral=True
+        )
+        return
+
+    # Bulk operations on every member can take a while, so defer immediately
+    # to avoid the 3-second interaction timeout.
+    await interaction.response.defer(thinking=True)
+
+    members_with_role = [m for m in from_role_obj.members]
+
+    if not members_with_role:
+        await interaction.followup.send(f'📋 No members currently have the "{from_role}" role. Nothing to do.')
+        return
+
+    updated = []
+    failed = []
+
+    for member in members_with_role:
+        try:
+            await member.remove_roles(from_role_obj, reason=f"role_purge run by {interaction.user.name}")
+            await member.add_roles(to_role_obj, reason=f"role_purge run by {interaction.user.name}")
+            updated.append(member.name)
+        except discord.Forbidden:
+            failed.append(f"{member.name} (missing permissions)")
+        except discord.HTTPException as e:
+            failed.append(f"{member.name} ({e})")
+
+    summary = (
+        f'✅ Role purge complete: moved **{len(updated)}** member(s) from '
+        f'"{from_role}" to "{to_role}".'
+    )
+    if failed:
+        failed_list = "\n".join(f"  • {f}" for f in failed[:20])
+        summary += f"\n⚠️ Failed for **{len(failed)}** member(s):\n{failed_list}"
+        if len(failed) > 20:
+            summary += f"\n  ...and {len(failed) - 20} more."
+
+    await interaction.followup.send(summary)
 
 tree.add_command(config_fkt)
 
@@ -1112,26 +1289,15 @@ async def rare_contribution_list(interaction: discord.Interaction, mine: bool = 
         return
 
     header_suffix = f" ({', '.join(active_filters)})" if active_filters else ""
-    lines = [f"💎 **Rare Contributions{header_suffix}:**\n"]
-    total_rares = 0
+    pages = build_contribution_pages(display_list, header_suffix)
 
-    for c in display_list:
-        ts = datetime.fromisoformat(c["timestamp"]).strftime("%Y-%m-%d %H:%M")
-        amount = c.get("amount", 0)
-        total_rares += amount
-        pool = c.get("pool", c.get("target", "?"))   # graceful fallback for old records
-        vote = c.get("vote", "Any")
-        lines.append(
-            f"`#{c['id']}` **{c['player']}** — `{amount}` rares → Pool: **{pool}** banked by **{c['logged_by']}** at {ts}"
-        )
+    if len(pages) == 1:
+        await interaction.response.send_message(embed=pages[0])
+        return
 
-    lines.append(f"\n**Total Rares in this list:** 💎 `{total_rares}`")
-
-    content = "\n".join(lines)
-    if len(content) > 2000:
-        await interaction.response.send_message("⚠️ The list is too long to display in one message. Please use the `mine` filter.", ephemeral=True)
-    else:
-        await interaction.response.send_message(content)
+    view = ContributionPaginator(pages, author_id=interaction.user.id)
+    await interaction.response.send_message(embed=pages[0], view=view)
+    view.message = await interaction.original_response()
 
 
 @rares.command(name="leaderboard", description="Show who has contributed the most rares")
@@ -1828,15 +1994,27 @@ async def bank_cook(interaction: discord.Interaction, location: str, rares: int 
 
     new_loose_rares = unconsumed_rares
 
-    await interaction.response.send_message(
-        f"🧪 **We've gotta cook, Mr. White!**\n"
-        f"{COOK_GIF_URL}\n\n"
-        f"**Starting loose balance:** 💎 `{loose_rares}` rares | 🪨 `{loose_alloys}` alloys\n\n"
-        f"🔥 Cooked `{rares_to_cook}` rares → 🪨 `{cooked_alloys}` alloys "
-        f"*(+💎 `{leftover_rares}` remainder)*\n\n"
-        f"**Added at {location}:** 💎 `{leftover_rares}` rares | 🪨 `{cooked_alloys}` alloys\n"
-        f"**Remaining loose:** 💎 `{new_loose_rares}` rares | 🪨 `{loose_alloys}` alloys" if location != "loose" else ""
-    )
+    if location != "loose":
+        await interaction.response.send_message(
+            f"🧪 **We've gotta cook, Mr. White!**\n"
+            f"{COOK_GIF_URL}\n\n"
+            f"**Starting loose balance:** 💎 `{loose_rares}` rares | 🪨 `{loose_alloys}` alloys\n\n"
+            f"🔥 Cooked `{rares_to_cook}` rares → 🪨 `{cooked_alloys}` alloys "
+            f"{f'*(+💎 `{leftover_rares}` remainder)*' if leftover_rares > 0 else ''}" # Inline check
+            f"\n\n**Added at {location}:** 💎 `{leftover_rares}` rares | 🪨 `{cooked_alloys}` alloys\n"
+            f"**Remaining loose:** 💎 `{new_loose_rares}` rares | 🪨 `{loose_alloys}` alloys"
+        )
+    else:
+        await interaction.response.send_message(
+            f"🧪 **We've gotta cook, Mr. White!**\n"
+            f"{COOK_GIF_URL}\n\n"
+            f"**Starting loose balance:** 💎 `{loose_rares}` rares | 🪨 `{loose_alloys}` alloys\n\n"
+            f"🔥 Cooked `{rares_to_cook}` rares → 🪨 `{cooked_alloys}` alloys "
+            f"{f'*(+💎 `{leftover_rares}` remainder)*' if leftover_rares > 0 else ''}" # Inline check
+            f"\n\n**New loose amount:** 💎 `{leftover_rares + new_loose_rares}` rares | 🪨 `{cooked_alloys + loose_alloys}` alloys"
+        )
+
+
 
 @bank.command(name="log", description="View recent bank transactions in a readable format")
 @app_commands.describe(

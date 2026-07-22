@@ -6,6 +6,12 @@
    "Rares": 7000
  },
  {
+   "Name": "Dry Dock",
+   "Category": "Building",
+   "Alloys": 35,
+   "Rares": 700
+ },
+ {
    "Name": "Intelligence Center",
    "Category": "Building",
    "Alloys": 3,
@@ -50,8 +56,8 @@
  {
    "Name": "Pilot Uniform",
    "Category": "Uniform",
-   "Alloys": 0.05,
-   "Rares": 1
+   "Alloys": 0.1,
+   "Rares": 2
  },
  {
    "Name": "Colonial Heavy Bomber (V-1 Tzykalia)",
@@ -80,8 +86,8 @@
  {
    "Name": "Warden Torpedo Bomber (M925 Austringer Man-O-War)",
    "Category": "Aircraft",
-   "Alloys": 5,
-   "Rares": 100
+   "Alloys": 6,
+   "Rares": 120
  },
  {
    "Name": "Warden Transport Aircraft (Rinnspeir Mk. I Zealot)",
@@ -96,7 +102,7 @@
    "Rares": 80
  },
  {
-   "Name": "Warden Amphibious Fighter (Tulka I1.9 White Raven)",
+   "Name": "Warden Amphibious Fighter (Sea Plane White Raven)",
    "Category": "Aircraft",
    "Alloys": 2,
    "Rares": 40
@@ -104,18 +110,18 @@
  {
    "Name": "Colonial Dive Bomber (Mergo-4 \"Myrmidon\")",
    "Category": "Aircraft",
-   "Alloys": 5,
-   "Rares": 100
+   "Alloys": 4,
+   "Rares": 80
  },
  {
    "Name": "Colonial Super Tank (O-75b \"Ares\")",
-   "Category": "Aircraft",
+   "Category": "Tank",
    "Alloys": 3,
    "Rares": 60
  },
  {
    "Name": "Warden Super Tank (Cullen Predator Mk. III)",
-   "Category": "Aircraft",
+   "Category": "Tank",
    "Alloys": 3,
    "Rares": 60
  },
@@ -313,6 +319,18 @@
  },
  {
    "Name": "Scout Tank (King Jester - Shatter Missiles)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+  {
+   "Name": "Light Tank (Sagaris - AA)",
+   "Category": "Tank",
+   "Alloys": 0,
+   "Rares": 0
+ },
+  {
+   "Name": "Light Tank (Birdeater - AA)",
    "Category": "Tank",
    "Alloys": 0,
    "Rares": 0
